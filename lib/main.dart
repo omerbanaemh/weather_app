@@ -4,15 +4,11 @@ import 'package:weather_app/obServer/bloc_observer.dart';
 import 'package:weather_app/pages/home_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:weather_app/services/weather_service.dart';
+import 'package:dio/dio.dart';
 
 void main() {
   Bloc.observer = MyBlocObserver();
-  runApp(
-    BlocProvider(
-      create: (context) => WeatherCubit(WeatherService()),
-      child: WeatherApp(),
-    ),
-  );
+  runApp(WeatherApp());
 }
 
 class WeatherApp extends StatelessWidget {
@@ -20,21 +16,24 @@ class WeatherApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<WeatherCubit, WeatherState>(
-      builder: (context, state) {
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            primarySwatch:
-                BlocProvider.of<WeatherCubit>(context).weather == null
-                ? Colors.blue
-                : BlocProvider.of<WeatherCubit>(
-                    context,
-                  ).weather!.getThemeColor(),
-          ),
-          home: HomePage(),
-        );
-      },
+    return BlocProvider(
+      create: (context) => WeatherCubit(WeatherService(dio: Dio())),
+      child: BlocBuilder<WeatherCubit, WeatherState>(
+        builder: (context, state) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              primarySwatch:
+                  BlocProvider.of<WeatherCubit>(context).weather == null
+                  ? Colors.blue
+                  : BlocProvider.of<WeatherCubit>(
+                      context,
+                    ).weather!.getThemeColor(),
+            ),
+            home: HomePage(),
+          );
+        },
+      ),
     );
   }
 }
