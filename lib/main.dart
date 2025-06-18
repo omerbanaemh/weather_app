@@ -7,7 +7,12 @@ import 'package:weather_app/services/weather_service.dart';
 
 void main() {
   Bloc.observer = MyBlocObserver();
-  runApp(WeatherApp());
+  runApp(
+    BlocProvider(
+      create: (context) => WeatherCubit(WeatherService()),
+      child: WeatherApp(),
+    ),
+  );
 }
 
 class WeatherApp extends StatelessWidget {
@@ -15,14 +20,21 @@ class WeatherApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => WeatherCubit(WeatherService()),
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-        ),
-        home: HomePage(),
-      ),
+    return BlocBuilder<WeatherCubit, WeatherState>(
+      builder: (context, state) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            primarySwatch:
+                BlocProvider.of<WeatherCubit>(context).weather == null
+                ? Colors.blue
+                : BlocProvider.of<WeatherCubit>(
+                    context,
+                  ).weather!.getThemeColor(),
+          ),
+          home: HomePage(),
+        );
+      },
     );
   }
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:weather_app/cubit/weather_cubit.dart';
-import 'package:weather_app/models/weather_model.dart';
 import 'package:weather_app/pages/search_page.dart';
 
 class HomePage extends StatelessWidget {
@@ -11,9 +10,11 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<WeatherCubit, WeatherState>(
       builder: (context, state) {
-        WeatherModel? weather = BlocProvider.of<WeatherCubit>(context).weather;
+        final cubit = context.read<WeatherCubit>();
+
         return Scaffold(
           appBar: AppBar(
+            // backgroundColor: cubit.weather?.getThemeColor(),
             actions: [
               IconButton(
                 onPressed: () {
@@ -38,9 +39,9 @@ class HomePage extends StatelessWidget {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        weather!.getThemeColor(),
-                        weather.getThemeColor()[300]!,
-                        weather.getThemeColor()[100]!,
+                        cubit.weather!.getThemeColor(),
+                        cubit.weather!.getThemeColor()[300]!,
+                        cubit.weather!.getThemeColor()[100]!,
                       ],
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
@@ -51,14 +52,14 @@ class HomePage extends StatelessWidget {
                     children: [
                       const Spacer(flex: 3),
                       Text(
-                        'cityName',
+                        cubit.weather!.cityName,
                         style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        'updated at : ${weather.date.hour.toString()}:${weather.date.minute.toString()}',
+                        'updated at : ${cubit.weather!.date.hour.toString()}:${cubit.weather!.date.minute.toString()}',
                         style: TextStyle(fontSize: 22),
                       ),
                       Spacer(),
@@ -66,10 +67,10 @@ class HomePage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           Image.asset(
-                           weather.getImage(),
+                           cubit.weather!.getImage(),
                           ),
                           Text(
-                            weather.temp.toInt().toString(),
+                            cubit.weather!.temp.toInt().toString(),
                             style: TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
@@ -78,10 +79,10 @@ class HomePage extends StatelessWidget {
                           Column(
                             children: [
                               Text(
-                                'maxTemp :${weather.maxTemp.toInt()}',
+                                'maxTemp :${cubit.weather!.maxTemp.toInt()}',
                               ),
                               Text(
-                                'minTemp : ${weather.minTemp.toInt()}',
+                                'minTemp : ${cubit.weather!.minTemp.toInt()}',
                               ),
                             ],
                           ),
@@ -89,7 +90,7 @@ class HomePage extends StatelessWidget {
                       ),
                       Spacer(),
                       Text(
-                        weather.weatherStateName,
+                        cubit.weather!.weatherStateName,
                         style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,

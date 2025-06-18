@@ -1,73 +1,96 @@
+
 import 'package:flutter/material.dart';
 
 class WeatherModel {
-  DateTime date;
-  double temp;
-  double maxTemp;
-  double minTemp;
-  String weatherStateName;
+  final String cityName;
+  final DateTime date;
+  final double temp;
+  final double maxTemp;
+  final double minTemp;
+  final String weatherStateName;
+  final String? image;
 
   WeatherModel(
-      {required this.date,
-      required this.temp,
-      required this.maxTemp,
-      required this.minTemp,
-      required this.weatherStateName});
+      {
+    required this.cityName,
+    required this.date,
+    required this.temp,
+    required this.maxTemp,
+    required this.minTemp,
+    required this.weatherStateName,
+    this.image,
+  });
 
   factory WeatherModel.fromJson(dynamic data) {
     var jsonData = data['forecast']['forecastday'][0]['day'];
 
     return WeatherModel(
-        date: DateTime.parse( data['current']['last_updated']),
-        temp: jsonData['avgtemp_c'],
-        maxTemp: jsonData['maxtemp_c'],
-        minTemp: jsonData['mintemp_c'],
-        weatherStateName: jsonData['condition']['text']);
+      cityName: data['location']['name'],
+      date: DateTime.parse(data['current']['last_updated']),
+      temp: jsonData['avgtemp_c'],
+      maxTemp: jsonData['maxtemp_c'],
+      minTemp: jsonData['mintemp_c'],
+      weatherStateName: jsonData['condition']['text'],
+    );
   }
 
   @override
   String toString() {
-    return 'tem = $temp  minTemp = $minTemp  date = $date';
+    return 'temp = $temp, minTemp = $minTemp, date = $date';
   }
 
-   String getImage() {
-    if (weatherStateName == 'Sunny' || weatherStateName == 'Clear' ||  weatherStateName == 'partly cloudy') {
+  String _cleanString() => weatherStateName.toLowerCase().trim();
+
+  static const clearStates = {'sunny', 'clear', 'partly cloudy'};
+  static const snowStates = {
+    'blizzard',
+    'patchy snow possible',
+    'patchy sleet possible',
+    'patchy freezing drizzle possible',
+    'blowing snow',
+  };
+  static const cloudyStates = {'freezing fog', 'fog', 'heavy cloud', 'mist'};
+  static const rainStates = {'patchy rain possible', 'heavy rain', 'showers'};
+  static const thunderStates = {
+    'thundery outbreaks possible',
+    'moderate or heavy snow with thunder',
+    'patchy light snow with thunder',
+    'moderate or heavy rain with thunder',
+    'patchy light rain with thunder',
+  };
+
+  String getImage() {
+    final state = _cleanString();
+
+    if (clearStates.contains(state)) {
       return 'assets/images/clear.png';
-    } else if (
-        
-        weatherStateName == 'Blizzard' ||  weatherStateName == 'Patchy snow possible'  ||  weatherStateName == 'Patchy sleet possible' || weatherStateName == 'Patchy freezing drizzle possible' || weatherStateName == 'Blowing snow') {
+    } else if (snowStates.contains(state)) {
       return 'assets/images/snow.png';
-    } else if (weatherStateName == 'Freezing fog' || weatherStateName == 'Fog' ||  weatherStateName == 'Heavy Cloud' || weatherStateName == 'Mist' || weatherStateName == 'Fog') {
+    } else if (cloudyStates.contains(state)) {
       return 'assets/images/cloudy.png';
-    } else if (weatherStateName == 'Patchy rain possible' ||
-        weatherStateName == 'Heavy Rain' ||
-        weatherStateName == 'Showers	') {
+    } else if (rainStates.contains(state)) {
       return 'assets/images/rainy.png';
-    } else if (weatherStateName == 'Thundery outbreaks possible' || weatherStateName == 'Moderate or heavy snow with thunder' || weatherStateName == 'Patchy light snow with thunder'|| weatherStateName == 'Moderate or heavy rain with thunder' || weatherStateName == 'Patchy light rain with thunder' ) {
+    } else if (thunderStates.contains(state)) {
       return 'assets/images/thunderstorm.png';
     } else {
       return 'assets/images/clear.png';
     }
   }
-MaterialColor getThemeColor() {
-    if (weatherStateName == 'Sunny' || weatherStateName == 'Clear' ||  weatherStateName == 'partly cloudy') {
+
+  MaterialColor getThemeColor() {
+    final state = _cleanString();
+    if (clearStates.contains(state)) {
       return Colors.orange;
-    } else if (
-        
-        weatherStateName == 'Blizzard' ||  weatherStateName == 'Patchy snow possible'  ||  weatherStateName == 'Patchy sleet possible' || weatherStateName == 'Patchy freezing drizzle possible' || weatherStateName == 'Blowing snow') {
+    } else if (snowStates.contains(state)) {
       return Colors.blue;
-    } else if (weatherStateName == 'Freezing fog' || weatherStateName == 'Fog' ||  weatherStateName == 'Heavy Cloud' || weatherStateName == 'Mist' || weatherStateName == 'Fog') {
+    } else if (cloudyStates.contains(state)) {
       return Colors.blueGrey;
-    } else if (weatherStateName == 'Patchy rain possible' ||
-        weatherStateName == 'Heavy Rain' ||
-        weatherStateName == 'Showers	') {
+    } else if (rainStates.contains(state)) {
       return Colors.blue;
-    } else if (weatherStateName == 'Thundery outbreaks possible' || weatherStateName == 'Moderate or heavy snow with thunder' || weatherStateName == 'Patchy light snow with thunder'|| weatherStateName == 'Moderate or heavy rain with thunder' || weatherStateName == 'Patchy light rain with thunder' ) {
+    } else if (thunderStates.contains(state)) {
       return Colors.deepPurple;
     } else {
       return Colors.orange;
     }
   }
-
-  
 }
